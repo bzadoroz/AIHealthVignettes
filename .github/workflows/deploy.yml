@@ -28,14 +28,16 @@ jobs:
         
       - name: Create config file
         run: |
-          mkdir -p www
-          echo "window.SUPABASE_CONFIG = {" > www/supabase-config.js
-          echo "  url: '${{ env.SUPABASE_URL }}'," >> www/supabase-config.js
-          echo "  key: '${{ env.SUPABASE_KEY }}'," >> www/supabase-config.js
-          echo "  table: '${{ env.SUPABASE_TABLE }}'," >> www/supabase-config.js
-          echo "  email: '${{ env.APP_EMAIL }}'," >> www/supabase-config.js
-          echo "  password: '${{ env.APP_PASSWORD }}'" >> www/supabase-config.js
-          echo "};" >> www/supabase-config.js
+          Rscript -e "
+          Sys.setenv(
+          SUPABASE_URL = '${{ env.SUPABASE_URL }}',
+          SUPABASE_KEY = '${{ env.SUPABASE_KEY }}',
+          SUPABASE_TABLE = '${{ env.SUPABASE_TABLE }}',
+          APP_EMAIL = '${{ env.APP_EMAIL }}',
+          APP_PASSWORD = '${{ env.APP_PASSWORD }}'
+          )
+          shinylive::export('.', '_site')
+    "
           
       - name: Export Shinylive app
         run: |
