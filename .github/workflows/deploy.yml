@@ -16,6 +16,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Debug environment variables
+        run: |
+          echo "=== Environment Variables Debug ==="
+          echo "SUPABASE_URL: '$SUPABASE_URL'"
+          echo "APP_EMAIL: '$APP_EMAIL'"
+          echo "SUPABASE_TABLE: '$SUPABASE_TABLE'"
+          echo "Are they empty?"
+          [ -z "$SUPABASE_URL" ] && echo "SUPABASE_URL is empty!" || echo "SUPABASE_URL has value"
+          [ -z "$APP_EMAIL" ] && echo "APP_EMAIL is empty!" || echo "APP_EMAIL has value"
       
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
