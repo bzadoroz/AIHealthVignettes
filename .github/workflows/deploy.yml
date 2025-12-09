@@ -53,7 +53,16 @@ jobs:
             APP_PASSWORD = "${{ secrets.SUPABASE_APP_PASSWORD }}"
           )
           EOF
-        
+      - name: Debug - Check APP_EMAIL secret
+        run: |
+          echo "APP_EMAIL: ${{ secrets.SUPABASE_APP_EMAIL }}"
+          echo "APP_EMAIL via env: $APP_EMAIL"
+          Rscript -e "
+          Sys.setenv(APP_EMAIL = '${{ secrets.SUPABASE_APP_EMAIL }}')
+          cat('R APP_EMAIL:', Sys.getenv('APP_EMAIL'), '\n')
+          "
+        env:
+          APP_EMAIL: ${{ secrets.SUPABASE_APP_EMAIL }}  
       - name: Export Shinylive app
         run: |
           Rscript -e "
