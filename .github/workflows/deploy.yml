@@ -1,0 +1,49 @@
+# .github/workflows/deploy.yml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+  SUPABASE_TABLE: ${{ secrets.SUPABASE_TABLE }}
+  APP_EMAIL: ${{ secrets.SUPABASE_APP_EMAIL }}
+  APP_PASSWORD: ${{ secrets.SUPABASE_APP_PASSWORD }}
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        
+      - name: Install dependencies
+        run: |
+          install.packages(c("shinylive", "httpuv"))
+        shell: Rscript {0}
+        
+      - name: Create config file
+        run: |
+          mkdir -p www
+          echo "window.SUPABASE_CONFIG = {" > www/supabase-config.js
+          echo "  url: '${{ env.SUPABASE_URL }}'," >> www/supabase-config.js
+          echo "  key: '${{ env.SUPABASE_KEY }}'," >> www/supabase-config.js
+          echo "  table: '${{ env.SUPABASE_TABLE }}'," >> www/supabase-config.js
+          echo "  email: '${{ env.APP_EMAIL }}'," >> www/supabase-config.js
+          echo "  password: '${{ env.APP_PASSWORD }}'" >> www/supabase-config.js
+          echo "};" >> www/supabase-config.js
+          
+      - name: Export Shinylive app
+        run: |
+          shinylive::export(".", "_site")
+        shell: Rscript {0}
+        
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
