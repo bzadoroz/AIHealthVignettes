@@ -8,14 +8,13 @@ library(jsonlite)
 # -----------------------------
 # Supabase configuration
 # -----------------------------
-if (file.exists(".Renviron")) readRenviron(".Renviron")
 
 # Resolve envs into R variables (single source of truth)
-SUPABASE_URL   <- Sys.getenv("SUPABASE_URL")
-SUPABASE_KEY   <- Sys.getenv("SUPABASE_KEY")
-SUPABASE_TABLE <- Sys.getenv("SUPABASE_TABLE", "responses")
-APP_EMAIL      <- Sys.getenv("SUPABASE_APP_EMAIL")
-APP_PASSWORD   <- Sys.getenv("SUPABASE_APP_PASSWORD")
+SUPABASE_URL <- "SUPABASE_URL_PLACEHOLDER"
+SUPABASE_KEY <- "SUPABASE_KEY_PLACEHOLDER"
+SUPABASE_TABLE <- "SUPABASE_TABLE_PLACEHOLDER"
+APP_EMAIL <- "APP_EMAIL_PLACEHOLDER"
+APP_PASSWORD <- "APP_PASSWORD_PLACEHOLDER"
 
 # Sign in with password grant (server-side)
 supabase_sign_in <- function(email, password) {

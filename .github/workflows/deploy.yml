@@ -42,18 +42,23 @@ jobs:
             htmltools
             httr
             jsonlite
+
+      - name: Replace placeholders with real values
+        run: |
+              # Backup original app.R
+          cp app.R app.R.template
+          
+          # Replace placeholders with actual values
+          sed -i "s|SUPABASE_URL_PLACEHOLDER|$SUPABASE_URL|g" app.R
+          sed -i "s|SUPABASE_KEY_PLACEHOLDER|$SUPABASE_KEY|g" app.R
+          sed -i "s|SUPABASE_TABLE_PLACEHOLDER|$SUPABASE_TABLE|g" app.R
+          sed -i "s|APP_EMAIL_PLACEHOLDER|$APP_EMAIL|g" app.R
+          sed -i "s|APP_PASSWORD_PLACEHOLDER|$APP_PASSWORD|g" app.R
+          
      
       - name: Export Shinylive app
         run: |
           Rscript -e "
-          # Get from environment - no direct substitution
-          Sys.setenv(
-            SUPABASE_URL = Sys.getenv('SUPABASE_URL'),
-            SUPABASE_KEY = Sys.getenv('SUPABASE_KEY'), 
-            SUPABASE_TABLE = Sys.getenv('SUPABASE_TABLE'),
-            APP_EMAIL = Sys.getenv('APP_EMAIL'),
-            APP_PASSWORD = Sys.getenv('APP_PASSWORD')
-          )
           shinylive::export('.', '_site')
           "
         
