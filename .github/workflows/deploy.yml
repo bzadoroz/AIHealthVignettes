@@ -1,4 +1,3 @@
-# .github/workflows/deploy.yml
 name: Deploy to GitHub Pages
 
 on:
@@ -23,15 +22,44 @@ jobs:
         with: 
           use-public-rspm: true
         
+      - name: Detailed Debug - Check everything
+        run: |
+          echo "=== Current working directory ==="
+          pwd
+          echo ""
+          echo "=== All files in current directory ==="
+          ls -la
+          echo ""
+          echo "=== Content of app.R (first 10 lines) ==="
+          head -10 app.R || echo "app.R not found or not readable"
+          echo ""
+          echo "=== File permissions ==="
+          ls -la app.R || echo "app.R not found"
+          echo ""
+          echo "=== R working directory check ==="
+          Rscript -e "getwd(); list.files()"
+        
       - name: Setup R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           cache-version: 2
           packages: |
+            shiny
             shinylive
-            httpuv
         
-      - name: Export Shinylive app with environment variables
+      - name: Test shinylive detection
+        run: |
+          Rscript -e "
+          cat('R working directory:', getwd(), '\n')
+          cat('Files in current directory:\n')
+          print(list.files())
+          cat('Looking for app files:\n')
+          cat('app.R exists:', file.exists('app.R'), '\n')
+          cat('server.R exists:', file.exists('server.R'), '\n')
+          cat('ui.R exists:', file.exists('ui.R'), '\n')
+          "
+        
+      - name: Export Shinylive app
         run: |
           Rscript -e "
           Sys.setenv(
@@ -43,9 +71,3 @@ jobs:
           )
           shinylive::export('.', '_site')
           "
-        
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
