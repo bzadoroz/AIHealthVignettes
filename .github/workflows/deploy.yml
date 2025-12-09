@@ -42,17 +42,22 @@ jobs:
             htmltools
             httr
             jsonlite
+      - name: Create R config file
+        run: |
+          cat > config.R << 'EOF'
+          Sys.setenv(
+            SUPABASE_URL = "${{ secrets.SUPABASE_URL }}",
+            SUPABASE_KEY = "${{ secrets.SUPABASE_KEY }}",
+            SUPABASE_TABLE = "${{ secrets.SUPABASE_TABLE }}",
+            APP_EMAIL = "${{ secrets.SUPABASE_APP_EMAIL }}",
+            APP_PASSWORD = "${{ secrets.SUPABASE_APP_PASSWORD }}"
+          )
+          EOF
         
       - name: Export Shinylive app
         run: |
           Rscript -e "
-          Sys.setenv(
-            SUPABASE_URL = '${{ env.SUPABASE_URL }}',
-            SUPABASE_KEY = '${{ env.SUPABASE_KEY }}',
-            SUPABASE_TABLE = '${{ env.SUPABASE_TABLE }}',
-            APP_EMAIL = '${{ env.APP_EMAIL }}',
-            APP_PASSWORD = '${{ env.APP_PASSWORD }}'
-          )
+          source('config.R')
           shinylive::export('.', '_site')
           "
         
