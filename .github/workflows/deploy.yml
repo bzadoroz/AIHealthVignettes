@@ -37,7 +37,7 @@ jobs:
           APP_PASSWORD = '${{ env.APP_PASSWORD }}'
           )
           shinylive::export('.', '_site')
-    "
+          "
           
       - name: Export Shinylive app
         run: |
