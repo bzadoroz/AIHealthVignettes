@@ -60,22 +60,19 @@ jobs:
           SUPABASE_TABLE: ${{ secrets.SUPABASE_TABLE }}
           APP_EMAIL: ${{ secrets.SUPABASE_APP_EMAIL }}
           APP_PASSWORD: ${{ secrets.SUPABASE_APP_PASSWORD }}
+        shell: bash
         run: |
-          Rscript -e "
-          # Read template
-          content <- readLines('app.R')
-          
+          # Backup original app.R
           cp app.R app.R.template
+          
+          # Replace using sed with proper quoting around the environment variables
           sed -i "s|SUPABASE_URL_PLACEHOLDER|\"$SUPABASE_URL\"|g" app.R
           sed -i "s|SUPABASE_KEY_PLACEHOLDER|\"$SUPABASE_KEY\"|g" app.R
           sed -i "s|SUPABASE_TABLE_PLACEHOLDER|\"$SUPABASE_TABLE\"|g" app.R
           sed -i "s|APP_EMAIL_PLACEHOLDER|\"$APP_EMAIL\"|g" app.R
           sed -i "s|APP_PASSWORD_PLACEHOLDER|\"$APP_PASSWORD\"|g" app.R
           
-          # Write back
-          writeLines(content, 'app.R')
-          cat('Replacement completed\n')
-          " 
+          echo "Replacement completed"
      
       - name: Debug and Export Shinylive app
         run: |
