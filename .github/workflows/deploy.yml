@@ -53,18 +53,33 @@ jobs:
             httr
             jsonlite
 
-      - name: Replace placeholders with real values
+      - name: Debug sed replacement
         run: |
-              # Backup original app.R
-              cp app.R app.R.template
+          # Backup original app.R
+          cp app.R app.R.template
           
-              # Replace placeholders with actual values
-              sed -i "s|SUPABASE_URL_PLACEHOLDER|$SUPABASE_URL|g" app.R
-              sed -i "s|SUPABASE_KEY_PLACEHOLDER|$SUPABASE_KEY|g" app.R
-              sed -i "s|SUPABASE_TABLE_PLACEHOLDER|$SUPABASE_TABLE|g" app.R
-              sed -i "s|APP_EMAIL_PLACEHOLDER|$APP_EMAIL|g" app.R
-              sed -i "s|APP_PASSWORD_PLACEHOLDER|$APP_PASSWORD|g" app.R
+          echo "=== Before replacement (first 15 lines) ==="
+          head -15 app.R
           
+          echo "=== Testing one replacement ==="
+          # Test with a simple value first
+          echo 'TEST_PLACEHOLDER' > test.txt
+          sed -i "s|TEST_PLACEHOLDER|$APP_EMAIL|g" test.txt
+          echo "Test file after replacement:"
+          cat test.txt
+          
+          echo "=== Doing actual replacement ==="
+          sed -i "s|SUPABASE_URL_PLACEHOLDER|$SUPABASE_URL|g" app.R
+          sed -i "s|SUPABASE_KEY_PLACEHOLDER|$SUPABASE_KEY|g" app.R
+          sed -i "s|SUPABASE_TABLE_PLACEHOLDER|$SUPABASE_TABLE|g" app.R
+          sed -i "s|APP_EMAIL_PLACEHOLDER|$APP_EMAIL|g" app.R
+          sed -i "s|APP_PASSWORD_PLACEHOLDER|$APP_PASSWORD|g" app.R
+          
+          echo "=== After replacement (first 15 lines) ==="
+          head -15 app.R
+          
+          echo "=== Check for remaining placeholders ==="
+          grep -n "PLACEHOLDER" app.R || echo "No placeholders found"   
      
       - name: Export Shinylive app
         run: |
