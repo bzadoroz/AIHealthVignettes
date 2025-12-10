@@ -81,11 +81,37 @@ jobs:
           echo "=== Check for remaining placeholders ==="
           grep -n "PLACEHOLDER" app.R || echo "No placeholders found"   
      
-      - name: Export Shinylive app
+      - name: Debug and Export Shinylive app
         run: |
+          echo "=== Final app.R content (first 20 lines) ==="
+          head -20 app.R
+          
+          echo "=== Check app.R syntax ==="
           Rscript -e "
-          shinylive::export('.', '_site')
+          tryCatch({
+            source('app.R', echo = FALSE)
+            cat('✅ app.R syntax is valid\n')
+          }, error = function(e) {
+            cat('❌ app.R syntax error:\n')
+            cat(as.character(e), '\n')
+          })
           "
+          
+          echo "=== Export to Shinylive ==="
+          Rscript -e "
+          tryCatch({
+            shinylive::export('.', '_site')
+            cat('✅ Shinylive export successful\n')
+          }, error = function(e) {
+            cat('❌ Shinylive export failed:\n')
+            cat(as.character(e), '\n')
+          })
+          "
+          
+          echo "=== Check generated files ==="
+          ls -la _site/
+          echo "=== Check app.json content (first 10 lines) ==="
+          head -10 _site/app.json || echo "app.json not found"
         
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
