@@ -53,41 +53,17 @@ jobs:
             httr
             jsonlite
 
-      - name: Replace placeholders with real values (via Python)
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          SUPABASE_TABLE: ${{ secrets.SUPABASE_TABLE }}
-          APP_EMAIL: ${{ secrets.SUPABASE_APP_EMAIL }}
-          APP_PASSWORD: ${{ secrets.SUPABASE_APP_PASSWORD }}
+      - name: Create config file
         run: |
-          python3 << 'EOF'
-          import os
-          import shutil
-          
-          # Backup original
-          shutil.copy('app.R', 'app.R.template')
-          
-          # Read the file
-          with open('app.R', 'r') as f:
-              content = f.read()
-          
-          # Replace placeholders with environment variables
-          content = content.replace('SUPABASE_URL_PLACEHOLDER', os.environ.get('SUPABASE_URL', ''))
-          content = content.replace('SUPABASE_KEY_PLACEHOLDER', os.environ.get('SUPABASE_KEY', ''))
-          content = content.replace('SUPABASE_TABLE_PLACEHOLDER', os.environ.get('SUPABASE_TABLE', ''))
-          content = content.replace('APP_EMAIL_PLACEHOLDER', os.environ.get('APP_EMAIL', ''))
-          content = content.replace('APP_PASSWORD_PLACEHOLDER', os.environ.get('APP_PASSWORD', ''))
-          
-          # Write the modified content back
-          with open('app.R', 'w') as f:
-              f.write(content)
-          
-          print("Secret replacement completed successfully")
+          cat > config.json << EOF
+          {
+            "supabase_url": "${{ secrets.SUPABASE_URL }}",
+            "supabase_key": "${{ secrets.SUPABASE_KEY }}",
+            "supabase_table": ${{ secrets.SUPABASE_TABLE }},
+            "app_email": ${{ secrets.SUPABASE_APP_EMAIL }},
+            "app_password": ${{ secrets.SUPABASE_APP_PASSWORD }}
+          }
           EOF
-          
-          echo "Checking first few lines of modified app.R:"
-          head -10 app.R
      
       - name: Debug and Export Shinylive app
         run: |
