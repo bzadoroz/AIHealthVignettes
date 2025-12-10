@@ -9,12 +9,14 @@ library(jsonlite)
 # Supabase configuration
 # -----------------------------
 
+config <- fromJSON("config.json")
+
 # Resolve envs into R variables (single source of truth)
-SUPABASE_URL <- "SUPABASE_URL_PLACEHOLDER"
-SUPABASE_KEY <- "SUPABASE_KEY_PLACEHOLDER"
-SUPABASE_TABLE <- "SUPABASE_TABLE_PLACEHOLDER"
-APP_EMAIL <- "APP_EMAIL_PLACEHOLDER"
-APP_PASSWORD <- "APP_PASSWORD_PLACEHOLDER"
+SUPABASE_URL <- config$supabase_url
+SUPABASE_KEY <- config$supabase_key
+SUPABASE_TABLE <- config$supabase_table
+APP_EMAIL <- config$app_email
+APP_PASSWORD <- config$app_password
 
 # Sign in with password grant (server-side)
 supabase_sign_in <- function(email, password) {
