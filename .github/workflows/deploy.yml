@@ -65,12 +65,12 @@ jobs:
           # Read template
           content <- readLines('app.R')
           
-          # Replace using R (handles any special characters safely)
-          content <- gsub('SUPABASE_URL_PLACEHOLDER', Sys.getenv('SUPABASE_URL'), content, fixed = TRUE)
-          content <- gsub('SUPABASE_KEY_PLACEHOLDER', Sys.getenv('SUPABASE_KEY'), content, fixed = TRUE)
-          content <- gsub('SUPABASE_TABLE_PLACEHOLDER', Sys.getenv('SUPABASE_TABLE'), content, fixed = TRUE)
-          content <- gsub('APP_EMAIL_PLACEHOLDER', Sys.getenv('APP_EMAIL'), content, fixed = TRUE)
-          content <- gsub('APP_PASSWORD_PLACEHOLDER', Sys.getenv('APP_PASSWORD'), content, fixed = TRUE)
+          cp app.R app.R.template
+          sed -i "s|SUPABASE_URL_PLACEHOLDER|\"$SUPABASE_URL\"|g" app.R
+          sed -i "s|SUPABASE_KEY_PLACEHOLDER|\"$SUPABASE_KEY\"|g" app.R
+          sed -i "s|SUPABASE_TABLE_PLACEHOLDER|\"$SUPABASE_TABLE\"|g" app.R
+          sed -i "s|APP_EMAIL_PLACEHOLDER|\"$APP_EMAIL\"|g" app.R
+          sed -i "s|APP_PASSWORD_PLACEHOLDER|\"$APP_PASSWORD\"|g" app.R
           
           # Write back
           writeLines(content, 'app.R')
