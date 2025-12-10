@@ -65,12 +65,12 @@ jobs:
           # Backup original app.R
           cp app.R app.R.template
           
-          # Replace using sed with proper quoting around the environment variables
-          sed -i "s|SUPABASE_URL_PLACEHOLDER|\"$SUPABASE_URL\"|g" app.R
-          sed -i "s|SUPABASE_KEY_PLACEHOLDER|\"$SUPABASE_KEY\"|g" app.R
-          sed -i "s|SUPABASE_TABLE_PLACEHOLDER|\"$SUPABASE_TABLE\"|g" app.R
-          sed -i "s|APP_EMAIL_PLACEHOLDER|\"$APP_EMAIL\"|g" app.R
-          sed -i "s|APP_PASSWORD_PLACEHOLDER|\"$APP_PASSWORD\"|g" app.R
+           # Replace WITHOUT adding extra quotes (placeholders already have quotes)
+          sed -i "s|SUPABASE_URL_PLACEHOLDER|$SUPABASE_URL|g" app.R
+          sed -i "s|SUPABASE_KEY_PLACEHOLDER|$SUPABASE_KEY|g" app.R
+          sed -i "s|SUPABASE_TABLE_PLACEHOLDER|$SUPABASE_TABLE|g" app.R
+          sed -i "s|APP_EMAIL_PLACEHOLDER|$APP_EMAIL|g" app.R
+          sed -i "s|APP_PASSWORD_PLACEHOLDER|$APP_PASSWORD|g" app.R
           
           echo "Replacement completed"
      
