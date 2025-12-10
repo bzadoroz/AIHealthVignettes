@@ -53,26 +53,28 @@ jobs:
             httr
             jsonlite
 
-      - name: Replace placeholders with real values
+      - name: Create replacement script
+        run: |
+          cat > replace_secrets.sh << 'SCRIPT_EOF'
+          #!/bin/bash
+          cp app.R app.R.template
+          sed -i "s/SUPABASE_URL_PLACEHOLDER/$SUPABASE_URL/g" app.R
+          sed -i "s/SUPABASE_KEY_PLACEHOLDER/$SUPABASE_KEY/g" app.R
+          sed -i "s/SUPABASE_TABLE_PLACEHOLDER/$SUPABASE_TABLE/g" app.R
+          sed -i "s/APP_EMAIL_PLACEHOLDER/$APP_EMAIL/g" app.R
+          sed -i "s/APP_PASSWORD_PLACEHOLDER/$APP_PASSWORD/g" app.R
+          echo "Replacement completed"
+          SCRIPT_EOF
+          chmod +x replace_secrets.sh
+
+      - name: Run replacement script
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           SUPABASE_TABLE: ${{ secrets.SUPABASE_TABLE }}
           APP_EMAIL: ${{ secrets.SUPABASE_APP_EMAIL }}
           APP_PASSWORD: ${{ secrets.SUPABASE_APP_PASSWORD }}
-        shell: bash
-        run: |
-          # Backup original app.R
-          cp app.R app.R.template
-          
-           # Replace WITHOUT adding extra quotes (placeholders already have quotes)
-          sed -i "s|SUPABASE_URL_PLACEHOLDER|$SUPABASE_URL|g" app.R
-          sed -i "s|SUPABASE_KEY_PLACEHOLDER|$SUPABASE_KEY|g" app.R
-          sed -i "s|SUPABASE_TABLE_PLACEHOLDER|$SUPABASE_TABLE|g" app.R
-          sed -i "s|APP_EMAIL_PLACEHOLDER|$APP_EMAIL|g" app.R
-          sed -i "s|APP_PASSWORD_PLACEHOLDER|$APP_PASSWORD|g" app.R
-          
-          echo "Replacement completed"
+        run: ./replace_secrets.sh
      
       - name: Debug and Export Shinylive app
         run: |
