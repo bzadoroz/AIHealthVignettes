@@ -14,7 +14,7 @@ config <- fromJSON("config.json")
 # Resolve envs into R variables (single source of truth)
 SUPABASE_URL <- config$supabase_url
 SUPABASE_KEY <- config$supabase_key
-SUPABASE_TABLE <- config$supabase_table
+SUPABASE_TABLE <- responses
 APP_EMAIL <- config$app_email
 APP_PASSWORD <- config$app_password
 
