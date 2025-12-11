@@ -4,28 +4,11 @@ on:
   push:
     branches: [ main ]
 
-env:
-  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-  SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-  SUPABASE_TABLE: ${{ secrets.SUPABASE_TABLE }}
-  APP_EMAIL: ${{ secrets.SUPABASE_APP_EMAIL }}
-  APP_PASSWORD: ${{ secrets.SUPABASE_APP_PASSWORD }}
-
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Debug environment variables
-        run: |
-          echo "=== Environment Variables Debug ==="
-          echo "SUPABASE_URL: '$SUPABASE_URL'"
-          echo "APP_EMAIL: '$APP_EMAIL'"
-          echo "SUPABASE_TABLE: '$SUPABASE_TABLE'"
-          echo "Are they empty?"
-          [ -z "$SUPABASE_URL" ] && echo "SUPABASE_URL is empty!" || echo "SUPABASE_URL has value"
-          [ -z "$APP_EMAIL" ] && echo "APP_EMAIL is empty!" || echo "APP_EMAIL has value"
       
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
@@ -34,7 +17,6 @@ jobs:
         
       - name: Clean conflicting directories
         run: |
-          # Remove any existing shinylive artifacts that might conflict
           rm -rf shinylive/
           rm -f shinylive-sw.js
           rm -f index.html
@@ -53,49 +35,23 @@ jobs:
             httr
             jsonlite
 
-      - name: Create config file
+      - name: Create secrets files
         run: |
-          cat > config.json << EOF
-          {
-            "supabase_url": "${{ secrets.SUPABASE_URL }}",
-            "supabase_key": "${{ secrets.SUPABASE_KEY }}",
-            "supabase_table": ${{ secrets.SUPABASE_TABLE }},
-            "app_email": ${{ secrets.SUPABASE_APP_EMAIL }},
-            "app_password": ${{ secrets.SUPABASE_APP_PASSWORD }}
-          }
-          EOF
+          mkdir -p secrets
+          echo "${{ secrets.SUPABASE_URL }}" > secrets/url
+          echo "${{ secrets.SUPABASE_KEY }}" > secrets/key
+          echo "${{ secrets.SUPABASE_TABLE }}" > secrets/table
+          echo "${{ secrets.SUPABASE_APP_EMAIL }}" > secrets/email
+          echo "${{ secrets.SUPABASE_APP_PASSWORD }}" > secrets/password
+          
+          echo "=== Debug: Check if files were created ==="
+          ls -la secrets/
+          echo "URL file size: $(wc -c < secrets/url)"
+          echo "Key file size: $(wc -c < secrets/key)"
      
-      - name: Debug and Export Shinylive app
+      - name: Export Shinylive app
         run: |
-          echo "=== Final app.R content (first 20 lines) ==="
-          head -20 app.R
-          
-          echo "=== Check app.R syntax ==="
-          Rscript -e "
-          tryCatch({
-            source('app.R', echo = FALSE)
-            cat('✅ app.R syntax is valid\n')
-          }, error = function(e) {
-            cat('❌ app.R syntax error:\n')
-            cat(as.character(e), '\n')
-          })
-          "
-          
-          echo "=== Export to Shinylive ==="
-          Rscript -e "
-          tryCatch({
-            shinylive::export('.', '_site')
-            cat('✅ Shinylive export successful\n')
-          }, error = function(e) {
-            cat('❌ Shinylive export failed:\n')
-            cat(as.character(e), '\n')
-          })
-          "
-          
-          echo "=== Check generated files ==="
-          ls -la _site/
-          echo "=== Check app.json content (first 10 lines) ==="
-          head -10 _site/app.json || echo "app.json not found"
+          Rscript -e "shinylive::export('.', '_site')"
         
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
