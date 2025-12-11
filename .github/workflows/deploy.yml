@@ -35,19 +35,26 @@ jobs:
             httr
             jsonlite
 
-      - name: Create secrets files
+      - name: Create secrets using environment substitution
+        env:
+            SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+            SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+            SUPABASE_TABLE: ${{ secrets.SUPABASE_TABLE }}
+            APP_EMAIL: ${{ secrets.SUPABASE_APP_EMAIL }}
+            APP_PASSWORD: ${{ secrets.SUPABASE_APP_PASSWORD }}
         run: |
-          mkdir -p secrets
-          echo "${{ secrets.SUPABASE_URL }}" > secrets/url
-          echo "${{ secrets.SUPABASE_KEY }}" > secrets/key
-          echo "${{ secrets.SUPABASE_TABLE }}" > secrets/table
-          echo "${{ secrets.SUPABASE_APP_EMAIL }}" > secrets/email
-          echo "${{ secrets.SUPABASE_APP_PASSWORD }}" > secrets/password
-          
-          echo "=== Debug: Check if files were created ==="
-          ls -la secrets/
-          echo "URL file size: $(wc -c < secrets/url)"
-          echo "Key file size: $(wc -c < secrets/key)"
+            mkdir -p secrets
+            
+            # Use printf to avoid echo issues
+            printf '%s' "$SUPABASE_URL" > secrets/url
+            printf '%s' "$SUPABASE_KEY" > secrets/key
+            printf '%s' "$SUPABASE_TABLE" > secrets/table
+            printf '%s' "$APP_EMAIL" > secrets/email
+            printf '%s' "$APP_PASSWORD" > secrets/password
+            
+            echo "=== Debug: Check file contents ==="
+            echo "URL: $(cat secrets/url)"
+            echo "Email: $(cat secrets/email)"
      
       - name: Export Shinylive app
         run: |
