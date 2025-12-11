@@ -9,14 +9,11 @@ library(jsonlite)
 # Supabase configuration
 # -----------------------------
 
-config <- fromJSON("config.json")
-
-# Resolve envs into R variables (single source of truth)
-SUPABASE_URL <- config$supabase_url
-SUPABASE_KEY <- config$supabase_key
-SUPABASE_TABLE <- responses
-APP_EMAIL <- config$app_email
-APP_PASSWORD <- config$app_password
+SUPABASE_URL <- trimws(readLines("secrets/url", warn = FALSE)[1])
+SUPABASE_KEY <- trimws(readLines("secrets/key", warn = FALSE)[1])
+SUPABASE_TABLE <- trimws(readLines("secrets/table", warn = FALSE)[1])
+APP_EMAIL <- trimws(readLines("secrets/email", warn = FALSE)[1])
+APP_PASSWORD <- trimws(readLines("secrets/password", warn = FALSE)[1])
 
 # Sign in with password grant (server-side)
 supabase_sign_in <- function(email, password) {
